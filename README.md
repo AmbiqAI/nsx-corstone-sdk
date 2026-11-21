@@ -26,3 +26,19 @@ copyright notices. Paths beneath each upstream directory match its source tree.
 | [CMSIS_6](https://github.com/ARM-software/CMSIS_6) | 8753b993c7544f0329b2ccc61bfbc967fdb3b112 |
 | [Cortex_DFP](https://github.com/ARM-software/Cortex_DFP) | cd38dbb875f7195e70460eee51faa7ab180c24a1 |
 | [ethos-u-core-platform](https://git.gitlab.arm.com/artificial-intelligence/ethos-u/ethos-u-core-platform) | 8927abdff4441e8598dbbb3f7ee03bf6bc2a8d7c |
+
+## Verify the firmware
+
+With Arm GNU and newlib installed, cross-link the regression firmware:
+
+```sh
+cmake -S tests/bringup -B build -DCMAKE_SYSTEM_NAME=Generic \
+  -DCMAKE_C_COMPILER=arm-none-eabi-gcc -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
+cmake --build build
+```
+
+CI runs this cross-build. To qualify execution, load `build/bringup` into the
+Corstone-300/U55 FVP with 512 KiB ITCM and DTCM. Capture UART0 and check for
+`Corstone-300 startup and heap passed` and `Application exit code: 0.`. The
+probe exercises initialized data, a 400 KiB BSS, heap growth and shrink, and
+refusal of allocations beyond either bound.
