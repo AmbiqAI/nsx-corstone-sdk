@@ -1,0 +1,28 @@
+schema_version: 1
+module:
+  name: nsx-corstone-sdk
+  type: sdk_provider
+  version: 0.1.0
+  provider: corstone
+licenses:
+  .: BSD-3-Clause
+  upstream: Apache-2.0
+support:
+  ambiqsuite: false
+  corstone: true
+  zephyr: false
+build:
+  cmake:
+    package: nsx_corstone_sdk
+    targets:
+    - nsx::sdk_corstone
+depends:
+  required: []
+  optional: []
+compatibility:
+  boards:
+  - corstone300_fvp_u55
+  socs:
+  - corstone300
+  toolchains:
+  - arm-none-eabi-gcc

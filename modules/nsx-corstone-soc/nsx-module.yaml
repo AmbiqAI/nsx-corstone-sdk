@@ -1,0 +1,27 @@
+schema_version: 1
+module:
+  name: nsx-corstone-soc
+  type: soc
+  version: 0.1.0
+licenses:
+  .: BSD-3-Clause
+support:
+  ambiqsuite: false
+  corstone: true
+  zephyr: false
+build:
+  cmake:
+    package: nsx_corstone_soc
+    targets:
+    - nsx::corstone_soc
+depends:
+  required:
+  - nsx-corstone-sdk
+  optional: []
+compatibility:
+  boards:
+  - corstone300_fvp_u55
+  socs:
+  - corstone300
+  toolchains:
+  - arm-none-eabi-gcc
