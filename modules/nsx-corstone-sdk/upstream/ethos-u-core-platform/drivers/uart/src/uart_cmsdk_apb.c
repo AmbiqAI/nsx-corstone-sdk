@@ -95,6 +95,11 @@ unsigned int GetLine(char *lp, unsigned int len) {
     unsigned int cnt = 0;
     char c;
 
+    /* NSX: reserve space for a character and the terminating NUL. */
+    if (!lp || len < 2) {
+        return 0;
+    }
+
     do {
         c = UartGetc();
         switch (c) {
@@ -118,9 +123,6 @@ unsigned int GetLine(char *lp, unsigned int len) {
             *lp = 0; /* ESC - stop editing line        */
             return 0;
         case CR: /* CR - done, stop editing line   */
-            *lp = c;
-            lp++;  /* increment line pointer         */
-            cnt++; /* and count                      */
             c = LF;
             /* fall through */
         default:
@@ -130,7 +132,7 @@ unsigned int GetLine(char *lp, unsigned int len) {
             cnt++; /* and count                      */
             break;
         }
-    } while (cnt < len - 2 && c != LF); /* check limit and CR             */
+    } while (cnt < len - 1 && c != LF); /* check limit and CR             */
     *lp = 0;                            /* mark end of string             */
     return 1;
 }

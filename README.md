@@ -17,9 +17,12 @@ Install the model under [Arm's FVP terms](https://support.arm.com/tools-and-soft
 
 ## Source notices
 
-NSX glue is BSD-3-Clause. The unmodified files under
+NSX glue is BSD-3-Clause. The files under
 `modules/nsx-corstone-sdk/upstream` retain their Apache-2.0 licenses and
 copyright notices. Paths beneath each upstream directory match its source tree.
+Two files carry marked local changes. `drivers/uart/src/uart_cmsdk_apb.c`
+bounds console line input and `targets/corstone-300/retarget.c` returns a
+completed line to newlib. The revision table identifies their upstream baselines.
 
 | Upstream | Revision |
 | --- | --- |

@@ -126,6 +126,12 @@ int RETARGET(_read)(FILEHANDLE fh, unsigned char *buf, unsigned int len, int mod
             }
 
             buf[i] = (unsigned char)c;
+#if !defined(__ARMCC_VERSION)
+            /* NSX: newlib expects the byte count for this console line. */
+            if (c == '\n') {
+                return (int)(i + 1);
+            }
+#endif
         }
 
         return IO_OUTPUT(len);
