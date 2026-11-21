@@ -40,7 +40,7 @@ SECTIONS {
     .data : ALIGN(8) { *(.data*) . = ALIGN(4); } > DTCM AT> ITCM :data
     .bss (NOLOAD) : ALIGN(8) {
         __bss_start__ = .; *(.bss*) *(COMMON) . = ALIGN(8); __bss_end__ = .;
-    } > DTCM :data
+    } > DTCM :NONE
     __end__ = .;
     PROVIDE(end = .);
     PROVIDE(_end = .);
