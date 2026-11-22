@@ -22,7 +22,7 @@ NSX glue is BSD-3-Clause. The files under
 copyright notices. Paths beneath each upstream directory match its source tree.
 The ARMCM55 and ARMCM85 startup files carry a marked weak NPU interrupt vector. `drivers/uart/src/uart_cmsdk_apb.c`
 bounds console line input and `targets/corstone-300/retarget.c` returns a
-completed line to newlib. The driver and PMU diagnostics format 64-bit values as two 32-bit words for embedded newlib. The driver checks Vela payload bounds before dispatch and samples the split cycle counter across rollover. The revision table identifies their upstream baselines.
+completed line to newlib. The driver and PMU diagnostics format 64-bit values as two 32-bit words for embedded newlib. The driver checks Vela payload bounds before dispatch and samples the split cycle counter across rollover. The Corstone port masks the NPU IRQ during asynchronous cancellation and consumes an already completed job before reusing the reservation. The revision table identifies their upstream baselines.
 
 | Upstream | Revision |
 | --- | --- |

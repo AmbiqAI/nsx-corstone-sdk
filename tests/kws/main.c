@@ -22,6 +22,16 @@ int main(void)
     memset(arena, 0, sizeof(arena));
     uint64_t bases[] = {(uintptr_t)weights, (uintptr_t)arena};
     size_t sizes[] = {sizeof(weights), sizeof(arena)};
+    /* Return a reserved driver with an outstanding job. A subsequent
+     * dispatch must wait for its own completion and fill a fresh arena. */
+    if (ethosu_reserve_driver() != drv)
+        return 2;
+    if (ethosu_invoke_async(drv, commands, sizeof(commands), bases, sizes, 2, NULL) != 0)
+        return 2;
+    ethosu_release_driver(drv);
+    if (ethosu_reserve_driver() != drv)
+        return 2;
+    memset(arena, 0, sizeof(arena));
     ETHOSU_PMU_Enable(drv);
     ETHOSU_PMU_Set_EVTYPER(drv, 0, ETHOSU_PMU_NPU_ACTIVE);
     ETHOSU_PMU_EVCNTR_ALL_Reset(drv);
@@ -30,6 +40,7 @@ int main(void)
     int status = ethosu_invoke(drv, commands, sizeof(commands), bases, sizes, 2);
     uint32_t active = ETHOSU_PMU_Get_EVCNTR(drv, 0);
     uint64_t cycles = ETHOSU_PMU_Get_CCNTR(drv);
+    ethosu_release_driver(drv);
     ethosu_release_power(drv);
     if (cycles > UINT32_MAX)
         return 2;
