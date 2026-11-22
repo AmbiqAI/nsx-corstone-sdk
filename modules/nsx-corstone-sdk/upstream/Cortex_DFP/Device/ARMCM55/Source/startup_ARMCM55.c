@@ -60,6 +60,8 @@ void DebugMon_Handler       (void) __attribute__ ((weak, alias("Default_Handler"
 void PendSV_Handler         (void) __attribute__ ((weak, alias("Default_Handler")));
 void SysTick_Handler        (void) __attribute__ ((weak, alias("Default_Handler")));
 
+/* NSX modification: bind the Corstone NPU interrupt, with a CPU-only default. */
+void CorstoneNPU_Handler(void) __attribute__((weak, alias("Default_Handler")));
 void Interrupt0_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
 void Interrupt1_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
 void Interrupt2_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
@@ -110,8 +112,9 @@ extern const VECTOR_TABLE_Type __VECTOR_TABLE[496];
   Interrupt6_Handler,                       /*   6 Interrupt 6 */
   Interrupt7_Handler,                       /*   7 Interrupt 7 */
   Interrupt8_Handler,                       /*   8 Interrupt 8 */
-  Interrupt9_Handler                        /*   9 Interrupt 9 */
-                                            /* Interrupts 10 .. 480 are left out */
+  Interrupt9_Handler,                       /*   9 Interrupt 9 */
+                                            /* NSX Corstone NPU interrupt */
+  [16 + 56] = CorstoneNPU_Handler
 };
 
 #if defined ( __GNUC__ )

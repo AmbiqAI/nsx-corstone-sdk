@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include "uart_stdout.h"
 
+#ifdef TEST_NPU
+#include "nsx_corstone_npu.h"
+#endif
+
 extern void *_sbrk(ptrdiff_t increment);
 static volatile unsigned initialized = 0xA5;
 static volatile unsigned char scratch[400 * 1024];
@@ -24,6 +28,10 @@ int main(void)
     errno = 0;
     if (_sbrk(PTRDIFF_MIN) != (void *)-1 || errno != ENOMEM || _sbrk(0) != start)
         return 4;
-    puts("Corstone-300 startup and heap passed");
+#ifdef TEST_NPU
+    if (!nsx_corstone_npu_init())
+        return 5;
+#endif
+    puts("Corstone startup and heap passed");
     return 0;
 }

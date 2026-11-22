@@ -5,15 +5,20 @@ permissions:
 jobs:
   gcc:
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        board: [corstone300_fvp_u55, corstone320_fvp_u85]
+        npu: ['OFF', 'ON']
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install Arm GCC and newlib
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y gcc-arm-none-eabi libnewlib-arm-none-eabi
-      - name: Link the Corstone-300 bring-up test
+      - name: Link the bring-up test
         run: |
           cmake -S tests/bringup -B build -DCMAKE_SYSTEM_NAME=Generic \
+            -DNSX_BOARD=${{ matrix.board }} -DTEST_NPU=${{ matrix.npu }} \
             -DCMAKE_C_COMPILER=arm-none-eabi-gcc -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
           cmake --build build
           arm-none-eabi-readelf -lW build/bringup
