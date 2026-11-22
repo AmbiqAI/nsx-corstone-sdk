@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 set(driver "${NSX_CORSTONE_SOURCES}/ethos-u-core-driver")
-if(NSX_SOC_FAMILY STREQUAL "corstone300")
+if(NSX_SOC_FAMILY MATCHES "^corstone(300|310)$")
     set(arch ETHOSU55)
     set(ip u55)
     set(device ethosu_device_u55_u65.c)

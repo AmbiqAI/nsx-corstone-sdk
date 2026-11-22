@@ -2,7 +2,7 @@
 if(NSX_SOC_FAMILY STREQUAL "corstone300")
     set(device_name ARMCM55)
     set(cpu cortex-m55)
-elseif(NSX_SOC_FAMILY STREQUAL "corstone320")
+elseif(NSX_SOC_FAMILY MATCHES "^corstone(310|320)$")
     set(device_name ARMCM85)
     set(cpu cortex-m85)
 else()

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-if(NSX_BOARD STREQUAL "corstone300_fvp_u55")
+if(NSX_BOARD STREQUAL "corstone300_fvp_u55" OR NSX_BOARD STREQUAL "corstone310_fvp_u55")
     set(UART0_BASE 0x49303000)
 elseif(NSX_BOARD STREQUAL "corstone320_fvp_u85")
     set(UART0_BASE 0x48203000)

@@ -16,7 +16,7 @@ export LD_LIBRARY_PATH="$fvp_root/python/lib:$fvp_root/fmtplib:$model_dir${LD_LI
 Keep the host Python environment for the NSX CLI. A launcher script can
 also initialize Arm's environment just for the model process.
 
-Run from this provider checkout. For Corstone-300 substitute `corstone300_fvp_u55` and `ethos-u55-32`. Use a fresh output directory per target.
+Run from this provider checkout. For Corstone-300 or 310 use `corstone300_fvp_u55` or `corstone310_fvp_u55` and `ethos-u55-32`. The U55 executable for 310 is named `FVP_Corstone_SSE-310`. Use a fresh output directory per target.
 
 ```sh
 board=corstone320_fvp_u85

@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        board: [corstone300_fvp_u55, corstone320_fvp_u85]
+        board: [corstone300_fvp_u55, corstone310_fvp_u55, corstone320_fvp_u85]
         npu: ['OFF', 'ON']
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4

@@ -8,7 +8,7 @@ SoC startup and board support are separate CMake modules.
 | Board scope | CPU | NPU on reference model | Status |
 | --- | --- | --- | --- |
 | Corstone-300 | Cortex-M55 | Ethos-U55 variant | GCC CPU, console and optional U55-32 inference |
-| Corstone-310 | Cortex-M85 | Ethos-U55 | Candidate |
+| Corstone-310 | Cortex-M85 | Ethos-U55 | GCC CPU, console and optional U55-32 inference |
 | Corstone-320 | Cortex-M85 | Ethos-U85 | GCC CPU, console and optional U85-256 inference |
 
 Each board must qualify its startup, memory map, UART, model arguments and
@@ -47,8 +47,10 @@ Corstone-300/U55 FVP with 512 KiB ITCM and DTCM. Capture UART0 and check for
 probe exercises initialized data, a 400 KiB BSS, heap growth and shrink, and
 refusal of allocations beyond either bound.
 
+Corstone-310 uses MPS3 UART0, secure BRAM at 0x11000000 for reset and code, and U55 interrupt 16. Select it with `-DNSX_BOARD=corstone310_fvp_u55`.
+
 For Corstone-320, pass `-DNSX_BOARD=corstone320_fvp_u85`. It boots from secure
-ROM, executes from BRAM and uses SRAM for data. On both boards the optional
+ROM, executes from BRAM and uses SRAM for data. On all three boards the optional
 `nsx-corstone-npu` module supplies the Arm driver and board interrupt. With
 the default uncached startup, place initialized command and weight data in
 `.npu_model` (DDR) and an explicitly initialized scratch area in
