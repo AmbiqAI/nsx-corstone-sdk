@@ -169,7 +169,8 @@ uint64_t ETHOSU_PMU_Get_CCNTR(struct ethosu_driver *drv)
     uint32_t val_hi = drv->dev.reg->PMCCNTR.CYCLE_CNT_HI;
     uint64_t val    = ((uint64_t)val_hi << 32) | val_lo;
 
-    LOG_DEBUG("val=%" PRIu64, val);
+    /* NSX: retain the full diagnostic on newlib builds without PRIu64. */
+    LOG_DEBUG("val=0x%08" PRIx32 "%08" PRIx32, (uint32_t)(val >> 32), (uint32_t)val);
     return val;
 }
 

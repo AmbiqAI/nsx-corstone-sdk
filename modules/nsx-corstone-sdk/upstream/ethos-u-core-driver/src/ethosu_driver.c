@@ -359,7 +359,9 @@ static int handle_command_stream(struct ethosu_driver *drv, const uint8_t *cmd_s
     {
         if (0 != (drv->job.base_addr[i] & MASK_16_BYTE_ALIGN))
         {
-            LOG_ERR("Base addr %d: 0x%" PRIx64 "not aligned to 16 bytes", i, drv->job.base_addr[i]);
+            /* NSX: embedded newlib can omit 64-bit printf format macros. */
+            LOG_ERR("Base addr %d: 0x%08" PRIx32 "%08" PRIx32 " not aligned to 16 bytes", i,
+                    (uint32_t)(drv->job.base_addr[i] >> 32), (uint32_t)drv->job.base_addr[i]);
             return -1;
         }
     }

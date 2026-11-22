@@ -31,7 +31,9 @@ int main(void)
     uint32_t active = ETHOSU_PMU_Get_EVCNTR(drv, 0);
     uint64_t cycles = ETHOSU_PMU_Get_CCNTR(drv);
     ethosu_release_power(drv);
-    printf("NPU status=%d active=%" PRIu32 " total=%" PRIu64 " output=", status, active, cycles);
+    if (cycles > UINT32_MAX)
+        return 2;
+    printf("NPU status=%d active=%" PRIu32 " total=%" PRIu32 " output=", status, active, (uint32_t)cycles);
     for (size_t i = 0; i < sizeof(expected); ++i)
         printf("%02x", arena[OUTPUT_OFFSET + i]);
     puts("");
