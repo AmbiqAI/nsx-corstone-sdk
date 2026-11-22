@@ -365,6 +365,8 @@ struct ethosu_driver *ethosu_reserve_driver(void);
 
 /**
  * Release driver that was previously reserved with @see ethosu_reserve_driver.
+ * NSX Corstone: waits for any outstanding workload before returning the device.
+ * Call ethosu_wait explicitly to observe the inference result.
  *
  * @param drv       Pointer to driver handle
  */

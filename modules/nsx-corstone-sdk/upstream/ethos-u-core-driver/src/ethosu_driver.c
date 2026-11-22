@@ -785,37 +785,25 @@ struct ethosu_driver *ethosu_reserve_driver(void)
     return drv;
 }
 
-/* NSX Corstone port: preserve the prior NVIC enable state across cancellation. */
-extern uint32_t nsx_corstone_npu_mask_irq(void);
-extern void nsx_corstone_npu_restore_irq(uint32_t enabled, bool cancelled);
-
 void ethosu_release_driver(struct ethosu_driver *drv)
 {
-    ethosu_mutex_lock(ethosu_mutex);
-    if (drv != NULL && drv->reserved)
+    if (drv == NULL || !drv->reserved)
     {
-        uint32_t irq_enabled = nsx_corstone_npu_mask_irq();
-        bool cancelled = drv->job.state == ETHOSU_JOB_RUNNING;
-        if (cancelled)
-        {
-            /* The ISR has not posted its token. Stop the producer before
-             * discarding the pending IRQ and making this driver available. */
-            (void)ethosu_soft_reset(drv);
-            ethosu_invalidate_dcache(drv->job.base_addr, drv->job.base_addr_size, drv->job.num_base_addr);
-            ethosu_inference_end(drv, drv->job.user_arg);
-            ethosu_release_power(drv);
-            ethosu_reset_job(drv);
-        }
-        nsx_corstone_npu_restore_irq(irq_enabled, cancelled);
-        if (!cancelled && drv->job.state == ETHOSU_JOB_DONE)
-        {
-            /* The ISR already posted. Consume the token through normal cleanup. */
-            (void)ethosu_wait(drv, false);
-        }
-
-        drv->reserved = false;
-        LOG_DEBUG("NPU driver handle %p released", drv);
-        ethosu_semaphore_give(ethosu_semaphore);
+        return;
     }
+
+    /* NSX: finish the reserved job before returning the device to the
+     * pool. A forced reset can race the completion IRQ. Waiting consumes
+     * the matching semaphore token and runs normal cache/power cleanup.
+     * Callbacks run outside the global pool mutex. */
+    if (drv->job.state != ETHOSU_JOB_IDLE)
+    {
+        (void)ethosu_wait(drv, true);
+    }
+
+    ethosu_mutex_lock(ethosu_mutex);
+    drv->reserved = false;
+    LOG_DEBUG("NPU driver handle %p released", drv);
+    ethosu_semaphore_give(ethosu_semaphore);
     ethosu_mutex_unlock(ethosu_mutex);
 }

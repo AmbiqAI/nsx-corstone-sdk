@@ -32,19 +32,3 @@ struct ethosu_driver *nsx_corstone_npu_init(void)
     }
     return &driver;
 }
-
-/* Mask only this peripheral while the driver cancels a reserved job. */
-uint32_t nsx_corstone_npu_mask_irq(void)
-{
-    uint32_t enabled = NVIC_GetEnableIRQ(NPU_IRQ);
-    NVIC_DisableIRQ(NPU_IRQ);
-    return enabled;
-}
-
-void nsx_corstone_npu_restore_irq(uint32_t enabled, bool cancelled)
-{
-    if (cancelled)
-        NVIC_ClearPendingIRQ(NPU_IRQ);
-    if (enabled)
-        NVIC_EnableIRQ(NPU_IRQ);
-}
