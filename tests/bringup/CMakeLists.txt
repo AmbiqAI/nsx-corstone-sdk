@@ -15,6 +15,8 @@ include("${root}/cmake/nsx_corstone_bsp.cmake")
 foreach(module sdk soc bsp)
     add_subdirectory("${root}/modules/nsx-corstone-${module}" "${module}")
 endforeach()
+# Exercise the export set used by NSX libraries built against the CPU target.
+install(EXPORT nsxTargets NAMESPACE nsx:: DESTINATION lib/cmake/nsx)
 add_executable(bringup main.c)
 target_link_libraries(bringup PRIVATE nsx::bsp)
 
