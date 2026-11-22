@@ -178,7 +178,7 @@ void ETHOSU_PMU_Set_CCNTR(struct ethosu_driver *drv, uint64_t val)
 {
     uint32_t active = ETHOSU_PMU_CNTR_Status(drv) & ETHOSU_PMU_CCNT_Msk;
 
-    LOG_DEBUG("val=%llu", val);
+    LOG_DEBUG("val=0x%08" PRIx32 "%08" PRIx32, (uint32_t)(val >> 32), (uint32_t)val);
 
     if (active)
     {

@@ -146,7 +146,9 @@ void ethosu_dev_run_command_stream(struct ethosu_device *dev,
     struct regioncfg_r rcfg = {0};
     uint64_t qbase          = ethosu_address_remap((uintptr_t)cmd_stream_ptr, -1);
     assert(qbase <= ADDRESS_MASK);
-    LOG_DEBUG("QBASE=0x%016llx, QSIZE=%" PRIu32 ", cmd_stream_ptr=%p", qbase, cms_length, cmd_stream_ptr);
+    /* NSX: embedded newlib may lack 64-bit printf support. */
+    LOG_DEBUG("QBASE=0x%08" PRIx32 "%08" PRIx32 ", QSIZE=%" PRIu32 ", cmd_stream_ptr=%p",
+              (uint32_t)(qbase >> 32), (uint32_t)qbase, cms_length, cmd_stream_ptr);
 
     dev->reg->QBASE.word[0] = qbase & 0xffffffff;
     dev->reg->QBASE.word[1] = qbase >> 32;
@@ -157,7 +159,7 @@ void ethosu_dev_run_command_stream(struct ethosu_device *dev,
     {
         uint64_t addr = ethosu_address_remap(base_addr[i], i);
         assert(addr <= ADDRESS_MASK);
-        LOG_DEBUG("BASEP%d=0x%016llx", i, addr);
+        LOG_DEBUG("BASEP%d=0x%08" PRIx32 "%08" PRIx32, i, (uint32_t)(addr >> 32), (uint32_t)addr);
         dev->reg->BASEP[i].word[0] = addr & 0xffffffff;
         dev->reg->BASEP[i].word[1] = addr >> 32;
         rcfg.word |= ethosu_config_select(addr, i) << (i * 2);
