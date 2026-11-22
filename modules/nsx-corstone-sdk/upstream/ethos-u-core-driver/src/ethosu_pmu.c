@@ -165,8 +165,13 @@ uint32_t ETHOSU_PMU_CNTR_Status(struct ethosu_driver *drv)
 
 uint64_t ETHOSU_PMU_Get_CCNTR(struct ethosu_driver *drv)
 {
-    uint32_t val_lo = drv->dev.reg->PMCCNTR.CYCLE_CNT_LO;
-    uint32_t val_hi = drv->dev.reg->PMCCNTR.CYCLE_CNT_HI;
+    /* NSX: sample the split counter coherently across a low-word rollover. */
+    uint32_t val_hi, val_lo;
+    do
+    {
+        val_hi = drv->dev.reg->PMCCNTR.CYCLE_CNT_HI;
+        val_lo = drv->dev.reg->PMCCNTR.CYCLE_CNT_LO;
+    } while (val_hi != drv->dev.reg->PMCCNTR.CYCLE_CNT_HI);
     uint64_t val    = ((uint64_t)val_hi << 32) | val_lo;
 
     /* NSX: retain the full diagnostic on newlib builds without PRIu64. */

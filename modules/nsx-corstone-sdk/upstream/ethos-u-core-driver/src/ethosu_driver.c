@@ -636,8 +636,17 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     assert(base_addr != NULL);
     assert(base_addr_size != NULL);
 
+    /* NSX: validate the complete payload before dispatching its one stream. */
+    if (custom_data_ptr == NULL || (uintptr_t)custom_data_ptr % sizeof(uint32_t) != 0 ||
+        custom_data_size < (int)sizeof(struct cop_data_s) ||
+        custom_data_size % sizeof(struct cop_data_s) != 0)
+    {
+        return -1;
+    }
     const struct cop_data_s *data_ptr = custom_data_ptr;
-    const struct cop_data_s *data_end = (struct cop_data_s *)((ptrdiff_t)custom_data_ptr + custom_data_size);
+    const struct cop_data_s *data_end = data_ptr + (size_t)custom_data_size / sizeof(*data_ptr);
+    const uint8_t *command_stream = NULL;
+    int cms_length = 0;
 
     // Make sure an inference is not already running
     if (drv->job.state != ETHOSU_JOB_IDLE)
@@ -658,13 +667,6 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
     if (data_ptr->word != ETHOSU_FOURCC)
     {
         LOG_ERR("Custom Operator Payload: %" PRIu32 " is not correct, expected %x", data_ptr->word, ETHOSU_FOURCC);
-        goto err;
-    }
-
-    // Custom data length must be a multiple of 32 bits
-    if ((custom_data_size % BYTES_IN_32_BITS) != 0)
-    {
-        LOG_ERR("custom_data_size=0x%x not a multiple of 4", (unsigned)custom_data_size);
         goto err;
     }
 
@@ -693,7 +695,8 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
             LOG_DEBUG("OPTIMIZER_CONFIG");
             struct opt_cfg_s const *opt_cfg_p = (const struct opt_cfg_s *)data_ptr;
 
-            if (handle_optimizer_config(drv, opt_cfg_p) < 0)
+            if (data_end - data_ptr < DRIVER_ACTION_LENGTH_32_BIT_WORD + OPTIMIZER_CONFIG_LENGTH_32_BIT_WORD ||
+                handle_optimizer_config(drv, opt_cfg_p) < 0)
             {
                 goto err;
             }
@@ -702,13 +705,13 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
         case COMMAND_STREAM:
             // Vela only supports putting one COMMAND_STREAM per op
             LOG_DEBUG("COMMAND_STREAM");
-            const uint8_t *command_stream = (const uint8_t *)(data_ptr + 1);
-            int cms_length                = (data_ptr->reserved << 16) | data_ptr->length;
-
-            if (handle_command_stream(drv, command_stream, cms_length) < 0)
+            cms_length = (data_ptr->reserved << 16) | data_ptr->length;
+            if (command_stream != NULL || cms_length == 0 ||
+                cms_length > data_end - data_ptr - DRIVER_ACTION_LENGTH_32_BIT_WORD)
             {
                 goto err;
             }
+            command_stream = (const uint8_t *)(data_ptr + 1);
             data_ptr += DRIVER_ACTION_LENGTH_32_BIT_WORD + cms_length;
             break;
         case NOP:
@@ -722,6 +725,10 @@ int ethosu_invoke_async(struct ethosu_driver *drv,
         }
     }
 
+    if (command_stream == NULL || handle_command_stream(drv, command_stream, cms_length) < 0)
+    {
+        goto err;
+    }
     return 0;
 err:
     LOG_ERR("Failed to invoke inference.");
