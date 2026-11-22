@@ -31,6 +31,9 @@ completed line to newlib. The driver and PMU diagnostics format 64-bit values as
 | [ethos-u-core-platform](https://git.gitlab.arm.com/artificial-intelligence/ethos-u/ethos-u-core-platform) | 8927abdff4441e8598dbbb3f7ee03bf6bc2a8d7c |
 | [ethos-u-core-driver](https://git.gitlab.arm.com/artificial-intelligence/ethos-u/ethos-u-core-driver) | 03567073fe2b9802c0bd73f9534da6f8a03924d1 |
 
+Static libraries can link `nsx::corstone_cpu` for the selected CPU flags and CMSIS
+headers. The board links `nsx::corstone_soc` to add reset and system sources to the firmware.
+
 ## Verify the firmware
 
 With Arm GNU and newlib installed, cross-link the regression firmware:

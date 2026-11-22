@@ -9,14 +9,18 @@ else()
     message(FATAL_ERROR "No qualified startup for Corstone SoC '${NSX_SOC_FAMILY}'")
 endif()
 set(device "${NSX_CORSTONE_SOURCES}/Cortex_DFP/Device/${device_name}")
+# Usage requirements for libraries that compile for the board's CPU.
+add_library(nsx_corstone_cpu INTERFACE)
+add_library(nsx::corstone_cpu ALIAS nsx_corstone_cpu)
+target_include_directories(nsx_corstone_cpu INTERFACE
+    "${NSX_CORSTONE_SOURCES}/CMSIS_6/CMSIS/Core/Include" "${device}/Include")
+target_compile_definitions(nsx_corstone_cpu INTERFACE ${device_name})
+target_compile_options(nsx_corstone_cpu INTERFACE -mcpu=${cpu} -mthumb -mfloat-abi=hard)
+target_link_options(nsx_corstone_cpu INTERFACE -mcpu=${cpu} -mthumb -mfloat-abi=hard)
+
 add_library(nsx_corstone_soc INTERFACE)
 add_library(nsx::corstone_soc ALIAS nsx_corstone_soc)
-target_link_libraries(nsx_corstone_soc INTERFACE nsx::sdk_corstone)
-target_include_directories(nsx_corstone_soc INTERFACE
-    "${NSX_CORSTONE_SOURCES}/CMSIS_6/CMSIS/Core/Include" "${device}/Include")
-target_compile_definitions(nsx_corstone_soc INTERFACE ${device_name})
-target_compile_options(nsx_corstone_soc INTERFACE -mcpu=${cpu} -mthumb -mfloat-abi=hard)
-target_link_options(nsx_corstone_soc INTERFACE -mcpu=${cpu} -mthumb -mfloat-abi=hard)
+target_link_libraries(nsx_corstone_soc INTERFACE nsx::sdk_corstone nsx::corstone_cpu)
 # Attach reset and system objects directly to each final ELF.
 target_sources(nsx_corstone_soc INTERFACE
     "${device}/Source/startup_${device_name}.c" "${device}/Source/system_${device_name}.c")

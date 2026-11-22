@@ -2,7 +2,7 @@ schema_version: 1
 module:
   name: nsx-corstone-soc
   type: soc
-  version: 0.1.0
+  version: 0.2.0
 licenses:
   .: BSD-3-Clause
 support:
@@ -14,6 +14,7 @@ build:
     package: nsx_corstone_soc
     targets:
     - nsx::corstone_soc
+    - nsx::corstone_cpu
 depends:
   required:
   - nsx-corstone-sdk
