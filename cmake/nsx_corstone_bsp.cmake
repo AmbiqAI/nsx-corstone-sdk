@@ -3,7 +3,7 @@ include_guard(GLOBAL)
 function(nsx_assert_bsp_contract_supported)
     cmake_parse_arguments(PARSE_ARGV 0 BSP "" "SOC;CONTRACT" "")
     if(BSP_UNPARSED_ARGUMENTS OR BSP_KEYWORDS_MISSING_VALUES OR
-       NOT BSP_SOC STREQUAL "corstone300" OR NOT BSP_CONTRACT STREQUAL "2")
+       NOT BSP_SOC MATCHES "^corstone(300|310|320)$" OR NOT BSP_CONTRACT STREQUAL "2")
         message(FATAL_ERROR "Unsupported Corstone BSP contract ${BSP_CONTRACT} for '${BSP_SOC}'")
     endif()
 endfunction()

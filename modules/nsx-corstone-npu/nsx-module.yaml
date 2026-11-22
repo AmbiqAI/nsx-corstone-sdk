@@ -1,0 +1,31 @@
+schema_version: 1
+module:
+  name: nsx-corstone-npu
+  type: backend_specific
+  version: 0.1.0
+licenses:
+  .: BSD-3-Clause
+support:
+  ambiqsuite: false
+  corstone: true
+  zephyr: false
+build:
+  cmake:
+    package: nsx_corstone_npu
+    targets:
+    - nsx::corstone_npu
+depends:
+  required:
+  - nsx-corstone-soc
+  optional: []
+compatibility:
+  boards:
+  - corstone300_fvp_u55
+  - corstone310_fvp_u55
+  - corstone320_fvp_u85
+  socs:
+  - corstone300
+  - corstone310
+  - corstone320
+  toolchains:
+  - arm-none-eabi-gcc

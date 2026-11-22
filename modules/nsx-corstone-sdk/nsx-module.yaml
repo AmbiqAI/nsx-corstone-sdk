@@ -22,7 +22,11 @@ depends:
 compatibility:
   boards:
   - corstone300_fvp_u55
+  - corstone310_fvp_u55
+  - corstone320_fvp_u85
   socs:
   - corstone300
+  - corstone310
+  - corstone320
   toolchains:
   - arm-none-eabi-gcc
