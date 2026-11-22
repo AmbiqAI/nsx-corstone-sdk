@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: BSD-3-Clause
+if(NOT NSX_BOARD STREQUAL "corstone300_fvp_u55")
+    message(FATAL_ERROR "No qualified Corstone BSP for '${NSX_BOARD}'")
+endif()
+set(platform "${NSX_CORSTONE_SOURCES}/ethos-u-core-platform")
+set(UART0_BASE 0x49303000)
+set(UART0_BAUDRATE 115200)
+set(SYSTEM_CORE_CLOCK 25000000)
+configure_file("${platform}/drivers/uart/uart_config.h.in" uart_config.h @ONLY)
+add_library(nsx_corstone_bsp INTERFACE)
+nsx_register_bsp(TARGET nsx_corstone_bsp CONTRACT 2 DEBUG_ITM 0 DEBUG_UART 1)
+target_link_libraries(nsx_corstone_bsp INTERFACE nsx::corstone_soc)
+target_include_directories(nsx_corstone_bsp INTERFACE
+    "${CMAKE_CURRENT_BINARY_DIR}" "${platform}/drivers/uart/include")
+target_sources(nsx_corstone_bsp INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/heap.c"
+    "${platform}/drivers/uart/src/uart_cmsdk_apb.c" "${platform}/targets/corstone-300/retarget.c")
+set(script "${CMAKE_CURRENT_SOURCE_DIR}/corstone300.ld")
+set(flags nsx_board_${NSX_BOARD}_flags)
+add_library(${flags} INTERFACE)
+add_library(nsx::board_flags ALIAS ${flags})
+target_link_options(${flags} INTERFACE "--specs=nosys.specs" "-T${script}")
+set_property(TARGET ${flags} PROPERTY INTERFACE_LINK_DEPENDS "${script}")
+target_link_libraries(nsx_corstone_bsp INTERFACE ${flags})

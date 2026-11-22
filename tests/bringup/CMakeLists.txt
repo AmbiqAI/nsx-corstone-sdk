@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: BSD-3-Clause
+cmake_minimum_required(VERSION 3.24)
+project(corstone_bringup LANGUAGES C)
+set(NSX_BOARD corstone300_fvp_u55)
+set(NSX_SOC_FAMILY corstone300)
+set(NSX_BSP_CONTRACT_REQUIRED 2)
+set(root "${CMAKE_CURRENT_LIST_DIR}/../..")
+include("${root}/cmake/nsx_corstone_bsp.cmake")
+foreach(module sdk soc bsp)
+    add_subdirectory("${root}/modules/nsx-corstone-${module}" "${module}")
+endforeach()
+add_executable(bringup main.c)
+target_link_libraries(bringup PRIVATE nsx::bsp)
